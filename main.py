@@ -51,48 +51,79 @@ def load_user(user_id):
     return Users.query.get(int(user_id))
 
 
-# peminjam = db.Table('peminjam',
-#                     db.Column('user_id', db.Integer,
-#                               db.ForeignKey('users.id')),
-#                     db.Column('barang_id', db.Integer,
-#                               db.ForeignKey('barangs.id_barang'))
-#                     )
+# # Create Model Peminjaman
+# peminjaman = db.Table('peminjaman',
+#                       db.Column('id_peminjaman', db.Integer,
+#                                 primary_key=True),
+#                       db.Column('user_id', db.Integer,
+#                                 db.ForeignKey('users.id')),
+#                       db.Column('barang_id', db.Integer,
+#                                 db.ForeignKey('barangs.id_barang')),
+#                       db.Column('tgl_pinjam', db.DateTime,
+#                                 server_default=db.func.now()),
+#                       db.Column('status', db.Boolean, default=False)
+#                       )
 
 
 # Create Model Users
 class Users(UserMixin, db.Model):
+    __tablename__ = 'users'
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(225), nullable=False)
     email = db.Column(db.String(225), nullable=False, unique=True)
     password = db.Column(db.String(128), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
-    # peminjam = db.relationship('Barangs', secondary=peminjam, backref='peminjam')
+
+    users = db.relationship(
+        'Peminjamans', back_populates='users')
 
 
 # Create Model Barang
 class Barangs(db.Model):
+    __tablename__ = 'barangs'
+
     id_barang = db.Column(db.Integer, primary_key=True)
     nama_barang = db.Column(db.String(225), nullable=False)
     jenis_barang = db.Column(db.String(225), nullable=False)
     stok_barang = db.Column(db.Integer, nullable=False)
     foto_barang = db.Column(db.String(), nullable=False)
 
-
-# # Create Model Peminjam
-# class Peminjaman(db.Model):
-#     id_peminjaman = db.Column(db.Integer, primary_key=True)
-#     id_barang = db.Column(db.String(225), nullable=False)
-#     id_user = db.Column(db.String(225), nullable=False)
-#     tgl_pinjam = db.Column(db.Integer, nullable=False)
-#     status = db.Column(db.Boolean, default=False)
+    barangs = db.relationship(
+        'Peminjamans', back_populates='barangs')
 
 
-# # Create Model Pengembalian
-# class Pengembalian(db.Model):
-#     id_pengembalian = db.Column(db.Integer, primary_key=True)
-#     id_barang = db.Column(db.String(225), nullable=False)
-#     id_user = db.Column(db.String(225), nullable=False)
-#     id_peminjaman = db.Column(db.Integer, nullable=False)
+# Create Model Peminjam
+class Peminjamans(db.Model):
+    __tablename__ = 'peminjamans'
+
+    id_peminjaman = db.Column(db.Integer, primary_key=True)
+    id_barang = db.Column(db.Integer, db.ForeignKey(
+        'barangs.id_barang'), primary_key=True)
+    id_user = db.Column(db.Integer, db.ForeignKey(
+        'users.id'), primary_key=True)
+    tgl_pinjam = db.Column(db.DateTime, server_default=db.func.now())
+    status = db.Column(db.Boolean, default=False)
+
+    users = db.relationship('Users', back_populates='users')
+    barangs = db.relationship('Barangs', back_populates='barangs')
+
+
+# Create Model Pengembalian
+class Pengembalians(db.Model):
+    __tablename__ = 'pengembalians'
+
+    id_pengembalian = db.Column(db.Integer, primary_key=True)
+    id_barang = db.Column(db.Integer, db.ForeignKey(
+        'barangs.id_barang'), primary_key=True)
+    id_user = db.Column(db.Integer, db.ForeignKey(
+        'users.id'), primary_key=True)
+    id_peminjaman = db.Column(
+        db.Integer, db.ForeignKey('peminjamans.id_peminjaman'), primary_key=True)
+    tgl_pengembalian = db.Column(db.DateTime, server_default=db.func.now())
+
+    peminjamans = db.relationship('Peminjamans')
+
 
 # 404 page not found
 @app.errorhandler(404)
