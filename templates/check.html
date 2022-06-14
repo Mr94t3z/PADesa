@@ -1,0 +1,32 @@
+<!-- Data File -->
+<div class="card">
+    <div class="card-body">
+      <table class="table">
+        <thead class>
+          <tr class="text-center">
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Password</th>
+            <th scope="col">Role</th>
+          </tr>
+        </thead>
+        <tbody class="table-group-divider">
+          {% for item in items %}
+          <tr>
+            <th class="text-center" scope="row">{{ item.id }}</th>
+            <td>{{ item.name }}</td>
+            <td>{{ item.email }}</td>
+            <td>{{ item.password }} </td>
+
+            {% if item.is_admin == False %}
+            <td> User </td>
+            {% elif item.is_admin == True %}
+            <td> Admin </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>

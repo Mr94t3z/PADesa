@@ -1,0 +1,62 @@
+<div class="page-header">
+    <h3 class="page-title">
+        <span class="page-title-icon bg-gradient-info text-white me-2">
+            <i class="mdi mdi-package"></i>
+        </span> Barangs Management
+    </h3>
+    <nav aria-label="breadcrumb">
+        <ul class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">
+                <span></span>Overview <i class="mdi mdi-alert-circle-outline icon-sm text-primary align-middle"></i>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+
+<div class="col-lg-12 grid-margin stretch-card">
+    <div class="card">
+        <div class="card-body" style="overflow-x:auto;">
+            <a href={{ url_for('add_barang')}} type="button" class="btn-sm btn-primary float-end mb-4">
+                <i class="mdi mdi-bookmark-plus-outline"></i>
+            </a>
+            <h4 class="card-title">Barangs Table</h4>
+            <table class="table table-striped">
+                <thead>
+                    <tr class="text-center">
+                        <th> No </th>
+                        <th> Nama Barang </th>
+                        <th> Jenis Barang </th>
+                        <th> Stok Barang </th>
+                        <th> Foto Barang </th>
+                        <th> Actions </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for barang in barangs %}
+                    <tr class="text-center">
+                        <td> {{ loop.index }} </td>
+                        <td> {{ barang.nama_barang }} </td>
+                        <td> {{ barang.jenis_barang }} </td>
+                        <td> {{ barang.stok_barang }} </td>
+                        <td> 
+                            <img src={{ url_for('static', filename='backend/assets/images/barang/'+barang.foto_barang ) }}> 
+                        </td>
+                        <td>
+                             <!-- update -->
+                            <a href="{{ url_for('edit_barang', id_barang=barang.id_barang) }}" type="submit" class="btn btn-dark btn-rounded btn-sm link-light">
+                                <i class="mdi mdi-table-edit"></i>
+                            </a>
+                            <!-- delete -->
+                            <a href="{{ url_for('delete_barang', id_barang=barang.id_barang) }}" type="submit" class="btn btn-danger btn-rounded btn-sm" onclick="return confirm('Apakah anda ingin menghapus barang {{ barang.nama_barang }}?')" title="Delete Barang">
+                                <i class="mdi mdi-window-close"></i>
+                            </a>
+                        </td>
+                        
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

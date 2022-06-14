@@ -1,0 +1,44 @@
+  <div class="page-header">
+    <h3 class="page-title">
+      <span class="page-title-icon bg-gradient-info text-white me-2">
+        <i class="mdi mdi-account-card-details"></i>
+      </span> Edit Data
+    </h3>
+    <nav aria-label="breadcrumb">
+      <ul class="breadcrumb">
+        <li class="breadcrumb-item active" aria-current="page">
+          <span></span>Overview <i class="mdi mdi-alert-circle-outline icon-sm text-primary align-middle"></i>
+        </li>
+      </ul>
+    </nav>
+  </div>
+  <div class="col-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title mb-4">Update User</h4>
+        <form class="forms-sample" method="POST">
+          <div class="form-group">
+            <label for="exampleInputName1">Name</label>
+            <input type="text" class="form-control" value="{{ update.name }}" name="name" id="name" placeholder={{ name }}>
+          </div>
+          <div class="form-group">
+            <label for="exampleInputEmail3">Email address</label>
+            <input type="email" class="form-control" value="{{ update.email }}" name="email" id="email" placeholder={{ email }}>
+          </div>
+          <div class="form-group">
+            <label for="exampleInputPassword4">Password</label>
+            <input type="password" class="form-control" name="password" id="password" placeholder="New Password">
+          </div>
+          <div class="form-group">
+            <label for="SelectRole">Role</label>
+            <select class="form-control" value="{{ update.is_admin }}" name="is_admin" id="is_admin">
+              <option value="True">Administrator</option>
+              <option value="False">Penduduk Desa</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-gradient-info me-2">Submit</button>
+          <button class="btn btn-light">Cancel</button>
+        </form>
+      </div>
+    </div>
+  </div>

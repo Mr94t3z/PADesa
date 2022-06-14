@@ -1,0 +1,40 @@
+<div class="page-header">
+    <h3 class="page-title">
+        <span class="page-title-icon bg-gradient-info text-white me-2">
+            <i class="mdi mdi-android-debug-bridge"></i>
+        </span> Peminjaman Management
+    </h3>
+    <nav aria-label="breadcrumb">
+        <ul class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">
+                <span></span>Overview <i class="mdi mdi-alert-circle-outline icon-sm text-primary align-middle"></i>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<div class="col-lg-12 grid-margin stretch-card">
+    <div class="card">
+        <div class="card-body" style="overflow-x:auto;">
+            <a href={{ url_for('add_barang')}} type="button" class="btn-sm btn-primary float-end mb-4">
+                <i class="mdi mdi-bookmark-plus-outline"></i>
+            </a>
+            <h4 class="card-title">Peminjaman Table</h4>
+            <table class="table table-striped">
+                <thead>
+                    <tr class="text-center">
+                        <th> No </th>
+                        <th> Nama Barang </th>
+                        <th> Nama Peminjam </th>
+                        <th> Tanggal Peminjaman </th>
+                        <th> Status </th>
+                        <th> Actions </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

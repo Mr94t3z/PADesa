@@ -1,0 +1,80 @@
+<nav class="sidebar sidebar-offcanvas" id="sidebar">
+  <ul class="nav">
+    <li class="nav-item nav-profile">
+      <a href="#" class="nav-link">
+        <div class="nav-profile-image">
+          {% if admin == False %}
+          <img src={{ url_for('static', filename='backend/assets/images/faces/pic.png') }} alt="profile">
+          {% elif admin == True %}
+          <img src={{ url_for('static', filename='backend/assets/images/faces/taopik.png') }} alt="profile">
+          {% endif %}
+          <span class="login-status online"></span>
+          <!--change to offline or busy as needed-->
+        </div>
+
+        <div class="nav-profile-text d-flex flex-column">
+          <span class="font-weight-bold mb-2">{{ name }}</span>
+          {% if admin == False %}
+          <span class="text-secondary text-small"> Penduduk Desa </span>
+          {% elif admin == True %}
+          <span class="text-secondary text-small"> Administrator </span>
+          {% endif %}
+        </div>
+        <i class="mdi mdi-check-decagram text-primary nav-profile-badge"></i>
+      </a>
+    </li>
+    <!-- if Login as Admin -->
+    {% if admin == True %}
+    <li class="nav-item">
+      <a class="nav-link" href={{ url_for('admin') }}>
+        <span class="menu-title">Dashboard</span>
+        <i class="mdi mdi-home menu-icon"></i>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href={{ url_for('show_user') }}>
+        <span class="menu-title">User Management</span>
+        <i class="mdi mdi-cat menu-icon"></i>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href={{ url_for('show_barang') }}>
+        <span class="menu-title" id='barang'>Barang Management</span>
+        <i class="mdi mdi-package menu-icon"></i>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href={{ url_for('show_peminjaman') }}>
+        <span class="menu-title">Peminjaman</span>
+        <i class="mdi mdi-android-debug-bridge menu-icon"></i>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href={{ url_for('show_pengembalian') }}>
+        <span class="menu-title">Pengembalian</span>
+        <i class="mdi mdi-truck menu-icon"></i>
+      </a>
+    </li>
+    <!-- if Login as User -->
+    {% elif admin == False %}
+    <li class="nav-item">
+      <a class="nav-link" href="index.html">
+        <span class="menu-title">Dashboard</span>
+        <i class="mdi mdi-home menu-icon"></i>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#">
+        <span class="menu-title">Peminjaman</span>
+        <i class="mdi mdi-account-card-details menu-icon"></i>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#">
+        <span class="menu-title">Pengembalian</span>
+        <i class="mdi mdi-account-card-details menu-icon"></i>
+      </a>
+    </li>
+    {% endif %}
+  </ul>
+</nav>

@@ -1,0 +1,9 @@
+# ptcache
+__pycache__/
+
+# virtual env
+env/
+
+# database
+migrations/
+padesa.db
