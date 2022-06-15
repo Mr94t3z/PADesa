@@ -1,6 +1,6 @@
 <div class="page-header">
     <h3 class="page-title">
-        <span class="page-title-icon bg-gradient-info text-white me-2">
+        <span class="page-title-icon bg-gradient-primary text-white me-2">
             <i class="mdi mdi-account-card-details"></i>
         </span> Users Management
     </h3>
@@ -35,13 +35,13 @@
                         <td> {{ item.name }} </td>
                         <td> {{ item.email }} </td>
                         {% if item.is_admin == False %}
-                        <td><label class="badge badge-success"> Penduduk Desa </label></td>
+                        <td><label class="badge badge-gradient-success"> Penduduk Desa </label></td>
                         {% elif item.is_admin == True %}
-                        <td><label class="badge badge-info"> Administrator </label></td>
+                        <td><label class="badge badge-gradient-info"> Administrator </label></td>
                         {% endif %}
                         <td> 
                             <!-- update -->
-                            <a href="{{ url_for('edit_user', id=item.id) }}" type="submit" class="btn btn-dark btn-rounded btn-sm link-light">
+                            <a href="{{ url_for('edit_user', id=item.id) }}" type="submit" class="btn btn-success btn-rounded btn-sm link-light">
                                 <i class="mdi mdi-table-edit"></i>
                             </a>
                             <!-- delete -->

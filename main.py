@@ -175,7 +175,8 @@ def register():
 @app.route('/dashboard', methods=["GET", "POST"])
 @login_required
 def admin():
-    return render_template('user-dashboard.html', name=current_user.name, admin=current_user.is_admin)
+    barangs = Barangs().query.all()
+    return render_template('user-dashboard.html', name=current_user.name, admin=current_user.is_admin, barangs=barangs)
 
 
 # show users page

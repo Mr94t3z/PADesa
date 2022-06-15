@@ -1,6 +1,6 @@
 <div class="page-header">
   <h3 class="page-title">
-    <span class="page-title-icon bg-gradient-info text-white me-2">
+    <span class="page-title-icon bg-gradient-primary text-white me-2">
       <i class="mdi mdi-home"></i>
     </span> Dashboard
   </h3>
@@ -12,6 +12,27 @@
     </ul>
   </nav>
 </div>
+
+
+<div class="row">
+  {% for barang in barangs %}
+  <div class="col-md-4 stretch-card grid-margin">
+    <div class="card bg-gradient-dark card-img-holder text-white">
+      <div class="card-body">
+        <img src={{ url_for('static', filename='backend/assets/images/barang/'+barang.foto_barang ) }} class="card-img-absolute mt-5" style="max-width: 120px; height: 120px; margin-right: 30px;" alt="circle-image" />
+        <h4 class="font-weight-normal mb-3">{{ barang.nama_barang }} <i class="mdi mdi-bookmark-outline mdi-20px float-right"></i>
+        </h4>
+        <h2 class="mb-5">{{ barang.stok_barang }}</h2>
+        <button class="btn-sm btn-gradient-primary btn-rounded btn-fw">
+          Pinjam
+        </button>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+
 <div class="row">
   <div class="col-12 grid-margin">
     <div class="card">
