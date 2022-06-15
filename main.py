@@ -113,7 +113,13 @@ class Pengembalians(db.Model):
 # 404 page not found
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template('error.html'), 404
+    return render_template('error-404.html'), 404
+
+
+# 505 internal server error
+@app.errorhandler(505)
+def page_not_found(e):
+    return render_template('error-505.html'), 505
 
 
 # login page
@@ -171,10 +177,10 @@ def register():
     return render_template('register.html')
 
 
-# admin page
+# dashboard page
 @app.route('/dashboard', methods=["GET", "POST"])
 @login_required
-def admin():
+def user_dashboard():
     barangs = Barangs().query.all()
     return render_template('user-dashboard.html', name=current_user.name, admin=current_user.is_admin, barangs=barangs)
 
