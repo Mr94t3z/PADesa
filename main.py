@@ -28,7 +28,6 @@ app.config['UPLOADED_PHOTOS_DEST'] = os.path.join(
     basedir, 'static/backend/assets/images/barang')
 
 configure_uploads(app, photos)
-# patch_request_class(app)
 
 
 # Initialize The Database
@@ -51,20 +50,6 @@ def load_user(user_id):
     return Users.query.get(int(user_id))
 
 
-# # Create Model Peminjaman
-# peminjaman = db.Table('peminjaman',
-#                       db.Column('id_peminjaman', db.Integer,
-#                                 primary_key=True),
-#                       db.Column('user_id', db.Integer,
-#                                 db.ForeignKey('users.id')),
-#                       db.Column('barang_id', db.Integer,
-#                                 db.ForeignKey('barangs.id_barang')),
-#                       db.Column('tgl_pinjam', db.DateTime,
-#                                 server_default=db.func.now()),
-#                       db.Column('status', db.Boolean, default=False)
-#                       )
-
-
 # Create Model Users
 class Users(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -79,7 +64,7 @@ class Users(UserMixin, db.Model):
         'Peminjamans', back_populates='users')
 
 
-# Create Model Barang
+# Create Model Barangs
 class Barangs(db.Model):
     __tablename__ = 'barangs'
 
@@ -93,7 +78,7 @@ class Barangs(db.Model):
         'Peminjamans', back_populates='barangs')
 
 
-# Create Model Peminjam
+# Create Model Peminjamans
 class Peminjamans(db.Model):
     __tablename__ = 'peminjamans'
 
@@ -109,7 +94,7 @@ class Peminjamans(db.Model):
     barangs = db.relationship('Barangs', back_populates='barangs')
 
 
-# Create Model Pengembalian
+# Create Model Pengembalians
 class Pengembalians(db.Model):
     __tablename__ = 'pengembalians'
 
@@ -293,7 +278,7 @@ def edit_barang(id_barang):
     if request.method == 'POST':
         update.nama_barang = request.form.get('nama_barang')
         update.jenis_barang = request.form.get('jenis_barang')
-        update.stok_barang = request.form['stok_barang']
+        update.stok_barang = request.form.get('stok_barang')
         if request.files.get('foto_barang'):
             try:
                 os.unlink(os.path.join(current_app.root_path,
