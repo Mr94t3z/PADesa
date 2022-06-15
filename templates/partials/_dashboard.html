@@ -19,13 +19,25 @@
   <div class="col-md-4 stretch-card grid-margin">
     <div class="card bg-gradient-dark card-img-holder text-white">
       <div class="card-body">
-        <img src={{ url_for('static', filename='backend/assets/images/barang/'+barang.foto_barang ) }} class="card-img-absolute mt-5" style="max-width: 120px; height: 120px; margin-right: 30px;" alt="circle-image" />
-        <h4 class="font-weight-normal mb-3">{{ barang.nama_barang }} <i class="mdi mdi-bookmark-outline mdi-20px float-right"></i>
+        <img src={{ url_for('static', filename='backend/assets/images/barang/'+barang.foto_barang ) }}
+          class="card-img-absolute mt-5" style="max-width: 110px; height: 110px; margin-right: 30px;"
+          alt="circle-image" />
+        <h4 class="font-weight-normal mb-3">{{ barang.nama_barang }} <i
+            class="mdi mdi-bookmark-outline mdi-20px float-right"></i>
         </h4>
         <h2 class="mb-5">{{ barang.stok_barang }}</h2>
-        <button type="submit" class="btn-sm btn-gradient-primary btn-rounded btn-fw">
-          Pinjam
-        </button>
+        <form class="forms-sample" enctype="multipart/form-data" method='POST'>
+
+          <input type="hidden" name="id_barang" value={{ barang.id_barang }}>
+          <input type="hidden" name="id_user" value={{ id_user }}>
+          <input type="hidden" name="qty" id="" value="1" min="1" max={{ barang.stok_barang }}
+            class="form-control btn-sm" style="width:60px;">
+
+          <button type="submit" class="btn-sm btn-gradient-primary btn-rounded btn-fw" style="margin-right: 105px;">
+            Pinjam
+          </button>
+
+        </form>
       </div>
     </div>
   </div>
@@ -37,63 +49,41 @@
   <div class="col-12 grid-margin">
     <div class="card">
       <div class="card-body">
-        <h4 class="card-title">Recent Tickets</h4>
+        <h4 class="card-title">Peminjam Terbaru</h4>
         <div class="table-responsive">
           <table class="table">
             <thead>
               <tr>
-                <th> Assignee </th>
-                <th> Subject </th>
+                <th> Peminjam </th>
+                <th> Barang </th>
                 <th> Status </th>
                 <th> Last Update </th>
-                <th> Tracking ID </th>
               </tr>
             </thead>
             <tbody>
+              {% for peminjaman in peminjamans %}
               <tr>
                 <td>
-                  <img src="assets/images/faces/face1.jpg" class="me-2" alt="image"> David Grey
+                  <img src={{ url_for('static', filename='backend/assets/images/faces/user.png') }} class="me-2" alt="image"> 
+                  {{ peminjaman.id_user }}
                 </td>
-                <td> Fund is not recieved </td>
+                <td> {{ peminjaman.id_barang }} </td>
+                {% if peminjaman.status == False %}
                 <td>
-                  <label class="badge badge-gradient-success">DONE</label>
+                  <label class="badge badge-gradient-danger">
+                    Belum Dikembalikan
+                  </label>
                 </td>
-                <td> Dec 5, 2017 </td>
-                <td> WD-12345 </td>
+                {% elif peminjaman.status == True %}
+                <td>
+                  <label class="badge badge-gradient-success">
+                    Sudah Dikembalikan
+                  </label>
+                </td>
+                {% endif %}
+                <td> {{ peminjaman.tgl_pinjam }} </td>
               </tr>
-              <tr>
-                <td>
-                  <img src="assets/images/faces/face2.jpg" class="me-2" alt="image"> Stella Johnson
-                </td>
-                <td> High loading time </td>
-                <td>
-                  <label class="badge badge-gradient-warning">PROGRESS</label>
-                </td>
-                <td> Dec 12, 2017 </td>
-                <td> WD-12346 </td>
-              </tr>
-              <tr>
-                <td>
-                  <img src="assets/images/faces/face3.jpg" class="me-2" alt="image"> Marina Michel
-                </td>
-                <td> Website down for one week </td>
-                <td>
-                  <label class="badge badge-gradient-info">ON HOLD</label>
-                </td>
-                <td> Dec 16, 2017 </td>
-                <td> WD-12347 </td>
-              </tr>
-              <tr>
-                <td>
-                  <img src="assets/images/faces/face4.jpg" class="me-2" alt="image"> John Doe
-                </td>
-                <td> Loosing control on server </td>
-                <td>
-                  <label class="badge badge-gradient-danger">REJECTED</label>
-                </td>
-                <td> Dec 3, 2017 </td>
-                <td> WD-12348 </td>
-              </tr>
+              {% endfor %}
             </tbody>
           </table>
         </div>

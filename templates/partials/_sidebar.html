@@ -4,23 +4,25 @@
       <a href="#" class="nav-link">
         <div class="nav-profile-image">
           {% if admin == False %}
-          <img src={{ url_for('static', filename='backend/assets/images/faces/pic.png') }} alt="profile">
+          <img src={{ url_for('static', filename='backend/assets/images/faces/user.png') }} alt="profile">
           {% elif admin == True %}
           <img src={{ url_for('static', filename='backend/assets/images/faces/taopik.png') }} alt="profile">
           {% endif %}
           <span class="login-status online"></span>
           <!--change to offline or busy as needed-->
         </div>
-
+        {% if admin == True %}
         <div class="nav-profile-text d-flex flex-column">
           <span class="font-weight-bold mb-2">{{ name }}</span>
-          {% if admin == False %}
-          <span class="text-secondary text-small"> Penduduk Desa </span>
-          {% elif admin == True %}
           <span class="text-secondary text-small"> Administrator </span>
-          {% endif %}
         </div>
         <i class="mdi mdi-check-decagram text-primary nav-profile-badge"></i>
+        {% elif admin == False %}
+        <div class="nav-profile-text d-flex flex-column">
+          <span class="font-weight-bold mb-2">{{ name }}</span>
+          <span class="text-secondary text-small"> Penduduk Desa </span>
+        </div>
+        {% endif %}
       </a>
     </li>
     <!-- if Login as Admin -->
@@ -58,7 +60,7 @@
     <!-- if Login as User -->
     {% elif admin == False %}
     <li class="nav-item">
-      <a class="nav-link" href="index.html">
+      <a class="nav-link" href={{ url_for('user_dashboard') }}>
         <span class="menu-title">Dashboard</span>
         <i class="mdi mdi-home menu-icon"></i>
       </a>

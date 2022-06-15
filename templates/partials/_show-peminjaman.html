@@ -26,13 +26,23 @@
                         <th> No </th>
                         <th> Nama Barang </th>
                         <th> Nama Peminjam </th>
+                        <th> Jumlah </th>
                         <th> Tanggal Peminjaman </th>
                         <th> Status </th>
                         <th> Actions </th>
                     </tr>
                 </thead>
                 <tbody>
-                    
+                    {% for peminjaman in peminjamans %}
+                    <tr class="text-center">
+                        <td> {{ loop.index }} </td>
+                        <td> {{ peminjaman.id_barang }} </td>
+                        <td> {{ peminjaman.id_user }} </td>
+                        <td> {{ peminjaman.qty }} </td>
+                        <td> {{ peminjaman.tgl_pinjam }} </td>
+                        <td> {{ peminjaman.status }} </td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

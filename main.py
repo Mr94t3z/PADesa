@@ -6,6 +6,8 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, log
 from flask_uploads import IMAGES, UploadSet, configure_uploads
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
+from sqlalchemy.orm import relationship, backref
+from sqlalchemy.sql import func
 
 # Add Database
 # basedir = 'sqlite:///' + os.path.join(os.path.abspath(os.path.dirname(__file__)), 'padesa.db')
@@ -50,6 +52,21 @@ def load_user(user_id):
     return Users.query.get(int(user_id))
 
 
+# # Create Model Peminjamans
+# peminjaman = db.Table('peminjamans',
+#                       db.Column('id_peminjaman', db.Integer,
+#                                 primary_key=True),
+#                       db.Column('id_barang', db.Integer,
+#                                 db.ForeignKey('barangs.id_barang')),
+#                       db.Column('id_user', db.Integer,
+#                                 db.ForeignKey('users.id')),
+#                       db.Column(db.Integer, nullable=False),
+#                       db.Column('tgl_pinjam', db.DateTime(timezone=True),
+#                                 default=db.func.now()),
+#                       db.Column('status', db.Boolean, default=False)
+#                       )
+
+
 # Create Model Users
 class Users(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -60,8 +77,7 @@ class Users(UserMixin, db.Model):
     password = db.Column(db.String(128), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
 
-    users = db.relationship(
-        'Peminjamans', back_populates='users')
+    barangs = relationship('Barangs', secondary='peminjamans')
 
 
 # Create Model Barangs
@@ -74,8 +90,7 @@ class Barangs(db.Model):
     stok_barang = db.Column(db.Integer, nullable=False)
     foto_barang = db.Column(db.String(), nullable=False)
 
-    barangs = db.relationship(
-        'Peminjamans', back_populates='barangs')
+    users = relationship('Users', secondary='peminjamans')
 
 
 # Create Model Peminjamans
@@ -84,42 +99,52 @@ class Peminjamans(db.Model):
 
     id_peminjaman = db.Column(db.Integer, primary_key=True)
     id_barang = db.Column(db.Integer, db.ForeignKey(
-        'barangs.id_barang'), primary_key=True)
+        'barangs.id_barang'),  nullable=False)
     id_user = db.Column(db.Integer, db.ForeignKey(
-        'users.id'), primary_key=True)
-    tgl_pinjam = db.Column(db.DateTime, server_default=db.func.now())
+        'users.id'),  nullable=False)
+    tgl_pinjam = db.Column(db.DateTime(timezone=True), default=db.func.now())
+    qty = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Boolean, default=False)
 
-    users = db.relationship('Users', back_populates='users')
-    barangs = db.relationship('Barangs', back_populates='barangs')
+    barang = db.relationship(Barangs, backref=backref(
+        "peminjamans", cascade="all, delete-orphan"))
+    user = db.relationship(Users, backref=backref(
+        "peminjamans", cascade="all, delete-orphan"))
 
 
-# Create Model Pengembalians
-class Pengembalians(db.Model):
-    __tablename__ = 'pengembalians'
+# # Create Model Pengembalians
+# class Pengembalians(db.Model):
+#     __tablename__ = 'pengembalians'
 
-    id_pengembalian = db.Column(db.Integer, primary_key=True)
-    id_barang = db.Column(db.Integer, db.ForeignKey(
-        'barangs.id_barang'), primary_key=True)
-    id_user = db.Column(db.Integer, db.ForeignKey(
-        'users.id'), primary_key=True)
-    id_peminjaman = db.Column(
-        db.Integer, db.ForeignKey('peminjamans.id_peminjaman'), primary_key=True)
-    tgl_pengembalian = db.Column(db.DateTime, server_default=db.func.now())
+#     id_pengembalian = db.Column(db.Integer, primary_key=True)
+#     # id_barang = db.Column(db.Integer, db.ForeignKey(
+#     #     'barangs.id_barang'), nullable=False)
+#     # id_user = db.Column(db.Integer, db.ForeignKey(
+#     #     'users.id'), nullable=False)
+#     id_peminjaman = db.Column(
+#         db.Integer, db.ForeignKey('peminjamans.id_peminjaman'), nullable=False)
+#     tgl_pengembalian = db.Column(db.DateTime(
+#         timezone=True), default=db.func.now())
 
-    peminjamans = db.relationship('Peminjamans')
+#     # __table_args__ = (db.UniqueConstraint(id_barang, id_user, id_peminjaman),)
+
+#     # barangs = db.relationship(
+#     #     "Barangs", back_populates="barangs_pengembalians")
+#     # users = db.relationship("Users", back_populates="users_pengembalians")
+#     Peminjamans = db.relationship(
+#         "Peminjamans")
 
 
 # 404 page not found
 @app.errorhandler(404)
-def page_not_found(e):
+def error_404(e):
     return render_template('error-404.html'), 404
 
 
 # 505 internal server error
-@app.errorhandler(505)
-def page_not_found(e):
-    return render_template('error-505.html'), 505
+@app.errorhandler(500)
+def error_500(e):
+    return render_template('error-500.html'), 500
 
 
 # login page
@@ -143,7 +168,7 @@ def login():
             return redirect(url_for('login'))
 
         login_user(user, remember=remember)
-        return redirect(url_for('admin'))
+        return redirect(url_for('user_dashboard'))
 
     return render_template('login.html')
 
@@ -181,8 +206,53 @@ def register():
 @app.route('/dashboard', methods=["GET", "POST"])
 @login_required
 def user_dashboard():
+    peminjamans = Peminjamans().query.all()
     barangs = Barangs().query.all()
-    return render_template('user-dashboard.html', name=current_user.name, admin=current_user.is_admin, barangs=barangs)
+
+    if request.method == 'POST':
+        id_barang = request.form.get('id_barang')
+        id_user = request.form.get('id_user')
+        qty = request.form.get('qty')
+
+        new_peminjaman = Peminjamans(
+            id_barang=id_barang, id_user=id_user, qty=qty)
+
+        db.session.add(new_peminjaman)
+        db.session.commit()
+        return redirect(url_for('show_peminjaman'))
+
+    return render_template('user-dashboard.html', id_user=current_user.id, name=current_user.name, admin=current_user.is_admin, barangs=barangs, peminjamans=peminjamans)
+
+
+# # peminjaman
+# @app.route('/addcart/<int:id_barang>', methods=["GET", "POST"])
+# @login_required
+# def add_peminjaman(id_barang):
+#     peminjaman = Peminjamans().query.get_or_404(id_barang)
+
+#     if request.method == 'POST':
+#         peminjaman.id_barang = request.form.get('id_barang')
+#         peminjaman.id_user = request.form.get('id_user')
+#         peminjaman.qty = request.form.get('qty')
+
+#         db.session.add(peminjaman)
+#         db.session.commit()
+#         return redirect(url_for('show_peminjaman'))
+
+#     return render_template('user-dashboard.html', id_user=current_user.id, name=current_user.name, admin=current_user.is_admin)
+
+
+# # orders
+# @app.route('/orders/<int:id>', methods=["GET", "POST"])
+# @login_required
+# def orders(id):
+#     if current_user:
+#         stok_barang = request.form.get('stok_barang')
+#         id_user = current_user.id
+#         users = Users.query.filter_by(id=id_user)
+#         barangs = Barangs.query.filter_by(id_user=id_user)
+
+#     return render_template('user-dashboard.html', name=current_user.name, admin=current_user.is_admin)
 
 
 # show users page
@@ -270,7 +340,7 @@ def add_barang():
         # add the new barang to the database
         db.session.add(new_barang)
         db.session.commit()
-        flash('Barang berhasil ditambahkan !', 'success')
+        #flash('Barang berhasil ditambahkan !', 'success')
         return redirect(url_for('show_barang'))
 
     return render_template('add-barang.html', name=current_user.name, admin=current_user.is_admin)
@@ -328,8 +398,11 @@ def delete_barang(id_barang):
 @ app.route('/peminjaman-management', methods=["GET", "POST"])
 @ login_required
 def show_peminjaman():
+    peminjamans = Peminjamans().query.all()
     barangs = Barangs().query.all()
-    return render_template('peminjaman-management.html', barangs=barangs, name=current_user.name, admin=current_user.is_admin)
+    users = Users().query.all()
+
+    return render_template('peminjaman-management.html', peminjamans=peminjamans, name=current_user.name, admin=current_user.is_admin, barangs=barangs, users=users)
 
 
 # show pengembalian page
