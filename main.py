@@ -208,6 +208,7 @@ def register():
 def user_dashboard():
     peminjamans = Peminjamans().query.all()
     barangs = Barangs().query.all()
+    users = Users().query.all()
 
     if request.method == 'POST':
         id_barang = request.form.get('id_barang')
@@ -219,9 +220,9 @@ def user_dashboard():
 
         db.session.add(new_peminjaman)
         db.session.commit()
-        return redirect(url_for('show_peminjaman'))
+        return redirect(url_for('user_dashboard'))
 
-    return render_template('user-dashboard.html', id_user=current_user.id, name=current_user.name, admin=current_user.is_admin, barangs=barangs, peminjamans=peminjamans)
+    return render_template('user-dashboard.html', id_user=current_user.id, name=current_user.name, admin=current_user.is_admin, peminjamans=peminjamans, barangs=barangs, users=users)
 
 
 # # peminjaman

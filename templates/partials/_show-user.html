@@ -35,9 +35,9 @@
                         <td> {{ item.name }} </td>
                         <td> {{ item.email }} </td>
                         {% if item.is_admin == False %}
-                        <td><label class="badge badge-gradient-success"> Penduduk Desa </label></td>
+                        <td><label class="badge badge-gradient-info"> Penduduk Desa </label></td>
                         {% elif item.is_admin == True %}
-                        <td><label class="badge badge-gradient-info"> Administrator </label></td>
+                        <td><label class="badge badge-gradient-dark"> Administrator </label></td>
                         {% endif %}
                         <td> 
                             <!-- update -->

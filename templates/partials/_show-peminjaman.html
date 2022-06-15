@@ -36,11 +36,31 @@
                     {% for peminjaman in peminjamans %}
                     <tr class="text-center">
                         <td> {{ loop.index }} </td>
-                        <td> {{ peminjaman.id_barang }} </td>
-                        <td> {{ peminjaman.id_user }} </td>
+                        {% for barang in barangs %}
+                        {% if peminjaman.id_barang == barang.id_barang %}
+                        <td> {{ barang.nama_barang }} </td>
+                        {% endif %}
+                        {% endfor %}
+                        {% for user in users %}
+                        {% if peminjaman.id_user == user.id %}
+                        <td> {{ user.name }} </td>
+                        {% endif %}
+                        {% endfor %}
                         <td> {{ peminjaman.qty }} </td>
                         <td> {{ peminjaman.tgl_pinjam }} </td>
-                        <td> {{ peminjaman.status }} </td>
+                        {% if peminjaman.status == False %}
+                        <td class="text-center">
+                          <label class="badge badge-gradient-danger">
+                            Belum Dikembalikan
+                          </label>
+                        </td>
+                        {% elif peminjaman.status == True %}
+                        <td class="text-center">
+                          <label class="badge badge-gradient-success">
+                            Sudah Dikembalikan
+                          </label>
+                        </td>
+                        {% endif %}
                     </tr>
                     {% endfor %}
                 </tbody>

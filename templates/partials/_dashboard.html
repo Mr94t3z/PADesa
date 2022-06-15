@@ -53,9 +53,11 @@
         <div class="table-responsive">
           <table class="table">
             <thead>
-              <tr>
+              <tr class="text-center">
+                <th> No </th>
                 <th> Peminjam </th>
                 <th> Barang </th>
+                <th> Jumlah </th>
                 <th> Status </th>
                 <th> Last Update </th>
               </tr>
@@ -63,25 +65,35 @@
             <tbody>
               {% for peminjaman in peminjamans %}
               <tr>
-                <td>
+                <td class="text-center"> {{ loop.index }} </td>
+                {% for user in users %}
+                {% if peminjaman.id_user == user.id %}
+                <td> 
                   <img src={{ url_for('static', filename='backend/assets/images/faces/user.png') }} class="me-2" alt="image"> 
-                  {{ peminjaman.id_user }}
+                  {{ user.name }}
                 </td>
-                <td> {{ peminjaman.id_barang }} </td>
+                {% endif %}
+                {% endfor %}
+                {% for barang in barangs %}
+                {% if peminjaman.id_barang == barang.id_barang %}
+                <td class="text-center"> {{ barang.nama_barang }} </td>
+                {% endif %}
+                {% endfor %}
+                <td class="text-center"> {{ peminjaman.qty }} </td>
                 {% if peminjaman.status == False %}
-                <td>
+                <td class="text-center">
                   <label class="badge badge-gradient-danger">
                     Belum Dikembalikan
                   </label>
                 </td>
                 {% elif peminjaman.status == True %}
-                <td>
+                <td class="text-center">
                   <label class="badge badge-gradient-success">
                     Sudah Dikembalikan
                   </label>
                 </td>
                 {% endif %}
-                <td> {{ peminjaman.tgl_pinjam }} </td>
+                <td class="text-center"> {{ peminjaman.tgl_pinjam }} </td>
               </tr>
               {% endfor %}
             </tbody>
