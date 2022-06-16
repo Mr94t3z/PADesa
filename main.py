@@ -1,5 +1,6 @@
 import os
 import secrets
+import datetime
 from flask import Flask, flash, request, redirect, render_template, url_for, current_app
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
@@ -7,7 +8,6 @@ from flask_uploads import IMAGES, UploadSet, configure_uploads
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
 from sqlalchemy.orm import relationship, backref
-from sqlalchemy.sql import func
 
 # Add Database
 # basedir = 'sqlite:///' + os.path.join(os.path.abspath(os.path.dirname(__file__)), 'padesa.db')
@@ -48,23 +48,9 @@ login_manager.init_app(app)
 
 @login_manager.user_loader
 def load_user(user_id):
-    # since the user_id is just the primary key of our user table, use it in the query for the user
+    # since the user_id is just the primary key
+    # of our user table, use it in the query for the user
     return Users.query.get(int(user_id))
-
-
-# # Create Model Peminjamans
-# peminjaman = db.Table('peminjamans',
-#                       db.Column('id_peminjaman', db.Integer,
-#                                 primary_key=True),
-#                       db.Column('id_barang', db.Integer,
-#                                 db.ForeignKey('barangs.id_barang')),
-#                       db.Column('id_user', db.Integer,
-#                                 db.ForeignKey('users.id')),
-#                       db.Column(db.Integer, nullable=False),
-#                       db.Column('tgl_pinjam', db.DateTime(timezone=True),
-#                                 default=db.func.now()),
-#                       db.Column('status', db.Boolean, default=False)
-#                       )
 
 
 # Create Model Users
@@ -102,7 +88,8 @@ class Peminjamans(db.Model):
         'barangs.id_barang'),  nullable=False)
     id_user = db.Column(db.Integer, db.ForeignKey(
         'users.id'),  nullable=False)
-    tgl_pinjam = db.Column(db.DateTime(timezone=True), default=db.func.now())
+    tgl_pinjam = db.Column(
+        db.DateTime, default=datetime.datetime.now().replace(microsecond=0), onupdate=datetime.datetime.now().replace(microsecond=0))
     qty = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Boolean, default=False)
 
@@ -111,28 +98,29 @@ class Peminjamans(db.Model):
     user = db.relationship(Users, backref=backref(
         "peminjamans", cascade="all, delete-orphan"))
 
+    peminjaman = relationship('Pengembalians')
 
-# # Create Model Pengembalians
-# class Pengembalians(db.Model):
-#     __tablename__ = 'pengembalians'
 
-#     id_pengembalian = db.Column(db.Integer, primary_key=True)
-#     # id_barang = db.Column(db.Integer, db.ForeignKey(
-#     #     'barangs.id_barang'), nullable=False)
-#     # id_user = db.Column(db.Integer, db.ForeignKey(
-#     #     'users.id'), nullable=False)
-#     id_peminjaman = db.Column(
-#         db.Integer, db.ForeignKey('peminjamans.id_peminjaman'), nullable=False)
-#     tgl_pengembalian = db.Column(db.DateTime(
-#         timezone=True), default=db.func.now())
+# Create Model Pengembalians
+class Pengembalians(db.Model):
+    __tablename__ = 'pengembalians'
 
-#     # __table_args__ = (db.UniqueConstraint(id_barang, id_user, id_peminjaman),)
+    id_pengembalian = db.Column(db.Integer, primary_key=True)
+    id_barang = db.Column(db.Integer, db.ForeignKey(
+        'barangs.id_barang'), nullable=False)
+    id_user = db.Column(db.Integer, db.ForeignKey(
+        'users.id'), nullable=False)
+    id_peminjaman = db.Column(
+        db.Integer, db.ForeignKey('peminjamans.id_peminjaman'), nullable=False)
+    tgl_pengembalian = db.Column(
+        db.DateTime, default=datetime.datetime.now().replace(microsecond=0), onupdate=datetime.datetime.now().replace(microsecond=0))
 
-#     # barangs = db.relationship(
-#     #     "Barangs", back_populates="barangs_pengembalians")
-#     # users = db.relationship("Users", back_populates="users_pengembalians")
-#     Peminjamans = db.relationship(
-#         "Peminjamans")
+    barang = db.relationship(Barangs, backref=backref(
+        "pengembalians", cascade="all, delete-orphan"))
+    user = db.relationship(Users, backref=backref(
+        "pengembalians", cascade="all, delete-orphan"))
+    peminjaman = db.relationship(Peminjamans, backref=backref(
+        "pengembalians", cascade="all, delete-orphan"))
 
 
 # 404 page not found
@@ -225,37 +213,6 @@ def user_dashboard():
     return render_template('user-dashboard.html', id_user=current_user.id, name=current_user.name, admin=current_user.is_admin, peminjamans=peminjamans, barangs=barangs, users=users)
 
 
-# # peminjaman
-# @app.route('/addcart/<int:id_barang>', methods=["GET", "POST"])
-# @login_required
-# def add_peminjaman(id_barang):
-#     peminjaman = Peminjamans().query.get_or_404(id_barang)
-
-#     if request.method == 'POST':
-#         peminjaman.id_barang = request.form.get('id_barang')
-#         peminjaman.id_user = request.form.get('id_user')
-#         peminjaman.qty = request.form.get('qty')
-
-#         db.session.add(peminjaman)
-#         db.session.commit()
-#         return redirect(url_for('show_peminjaman'))
-
-#     return render_template('user-dashboard.html', id_user=current_user.id, name=current_user.name, admin=current_user.is_admin)
-
-
-# # orders
-# @app.route('/orders/<int:id>', methods=["GET", "POST"])
-# @login_required
-# def orders(id):
-#     if current_user:
-#         stok_barang = request.form.get('stok_barang')
-#         id_user = current_user.id
-#         users = Users.query.filter_by(id=id_user)
-#         barangs = Barangs.query.filter_by(id_user=id_user)
-
-#     return render_template('user-dashboard.html', name=current_user.name, admin=current_user.is_admin)
-
-
 # show users page
 @app.route('/user-management', methods=["GET", "POST"])
 @login_required
@@ -327,11 +284,11 @@ def add_barang():
         barang = Barangs.query.filter_by(nama_barang=nama_barang).first()
 
         if barang:  # if a barang is found
-            flash('Barang sudah tersedia !', 'danger')
+            #flash('Barang sudah tersedia !', 'danger')
             return redirect(url_for('add_barang'))
 
         if not foto_barang:
-            flash('Foto tidak di isi !', 'danger')
+            #flash('Foto tidak di isi !', 'danger')
             return redirect(url_for('add_barang'))
 
         # create new barang
@@ -368,7 +325,7 @@ def edit_barang(id_barang):
                     'foto_barang'), name=secrets.token_hex(10) + '.')
 
         if not update.foto_barang:
-            flash('Foto tidak di isi !', 'danger')
+            #flash('Foto tidak di isi !', 'danger')
             return redirect(url_for('edit_barang'))
 
         db.session.commit()
@@ -410,8 +367,23 @@ def show_peminjaman():
 @ app.route('/pengembalian-management', methods=["GET", "POST"])
 @ login_required
 def show_pengembalian():
+    peminjamans = Peminjamans().query.all()
     barangs = Barangs().query.all()
-    return render_template('pengembalian-management.html', barangs=barangs, name=current_user.name, admin=current_user.is_admin)
+    users = Users().query.all()
+
+    if request.method == 'POST':
+        id_barang = request.form.get('id_barang')
+        id_user = request.form.get('id_user')
+        qty = request.form.get('qty')
+
+        new_peminjaman = Peminjamans(
+            id_barang=id_barang, id_user=id_user, qty=qty)
+
+        db.session.add(new_peminjaman)
+        db.session.commit()
+        return redirect(url_for('user_dashboard'))
+
+    return render_template('pengembalian-management.html', id_user=current_user.id, name=current_user.name, admin=current_user.is_admin, peminjamans=peminjamans, barangs=barangs, users=users)
 
 
 # user page
@@ -429,11 +401,10 @@ def logout():
     return redirect(url_for('login'))
 
 
-# check data
-# @ app.route('/check/<int:id>', methods=["GET", "POST"])
-# def check():
+# # pengembalian page
+# @ app.route('/pengembalian', methods=["GET", "POST"])
+# def add_pengembalian():
 #     items = Barangs.query.filter_by(id_barang=id).first()
-#     return Response('check.html', items=items)
 
 
 # main app
