@@ -194,6 +194,7 @@ def register():
 @ app.route('/dashboard', methods=["GET", "POST"])
 @ login_required
 def user_dashboard():
+    pengembalians = Pengembalians().query.all()
     peminjamans = Peminjamans().query.all()
     barangs = Barangs().query.all()
     users = Users().query.all()
@@ -210,7 +211,7 @@ def user_dashboard():
         db.session.commit()
         return redirect(url_for('user_dashboard'))
 
-    return render_template('user-dashboard.html', id_user=current_user.id, name=current_user.name, admin=current_user.is_admin, peminjamans=peminjamans, barangs=barangs, users=users)
+    return render_template('user-dashboard.html', id_user=current_user.id, name=current_user.name, admin=current_user.is_admin, pengembalians=pengembalians, peminjamans=peminjamans, barangs=barangs, users=users)
 
 
 # show users page
