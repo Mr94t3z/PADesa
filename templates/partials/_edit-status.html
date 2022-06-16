@@ -1,0 +1,40 @@
+<div class="page-header">
+    <h3 class="page-title">
+        <span class="page-title-icon bg-gradient-primary text-white me-2">
+            <i class="mdi mdi-account-card-details"></i>
+        </span> Status Peminjaman
+    </h3>
+    <nav aria-label="breadcrumb">
+        <ul class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">
+                <span></span>Overview <i class="mdi mdi-alert-circle-outline icon-sm text-primary align-middle"></i>
+            </li>
+        </ul>
+    </nav>
+</div>
+<div class="col-12 grid-margin stretch-card">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title mb-4">Update Status</h4>
+            <form class="forms-sample" method="POST">
+
+                <input type="hidden" name="id_barang" value={{ update.id_barang }}>
+                <input type="hidden" name="id_user" value={{ update.id_user }}>
+                <input type="hidden" name="id_peminjaman" value={{ update.id_barang }}>
+
+                <div class="form-group">
+                    <label for="SelectRole">Status</label>
+                    <select class="form-control" value="{{ update.status }}" name="status" id="status">
+                        <option value="True">Sudah Dikembalikan</option>
+                        <option value="False">Belum Dikembalikan</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-gradient-info me-2">
+                    Submit
+                </button>
+                <a href={{ url_for('show_pengembalian')}} type="button" class="btn btn-light">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>

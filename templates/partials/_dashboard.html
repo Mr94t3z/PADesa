@@ -33,7 +33,7 @@
           <input type="hidden" name="qty" id="" value="1" min="1" max={{ barang.stok_barang }}
             class="form-control btn-sm" style="width:60px;">
 
-          <button type="submit" class="btn-sm btn-gradient-primary btn-rounded btn-fw" style="margin-right: 105px;">
+          <button type="submit" class="btn-sm btn-gradient-primary btn-rounded btn-fw" style="margin-right: 105px;" onclick="return confirm('Apakah anda ingin meminjam {{ barang.nama_barang }}?')">
             Pinjam
           </button>
 

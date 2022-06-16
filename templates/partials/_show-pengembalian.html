@@ -28,7 +28,25 @@
                     </tr>
                 </thead>
                 <tbody>
-                    
+                    {% for pengembalian in pengembalians %}
+                    <tr class="text-center">
+                        <td> {{ loop.index }} </td>
+                        {% for barang in barangs %}
+                        {% if pengembalian.id_barang == barang.id_barang %}
+                        <td> {{ barang.nama_barang }} </td>
+                        {% endif %}
+                        {% endfor %}
+                        {% for user in users %}
+                        {% if pengembalian.id_user == user.id %}
+                        <td> {{ user.name }} </td>
+                        {% endif %}
+                        {% endfor %}
+                        {% for peminjaman in peminjamans %}
+                        <td> {{ peminjaman.tgl_pinjam }} </td>
+                        {% endfor %}
+                        <td> {{ pengembalian.tgl_pengembalian }} </td>
+
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

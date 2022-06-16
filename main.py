@@ -1,6 +1,6 @@
+from cmath import e
 import os
 import secrets
-import datetime
 from flask import Flask, flash, request, redirect, render_template, url_for, current_app
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
@@ -89,7 +89,7 @@ class Peminjamans(db.Model):
     id_user = db.Column(db.Integer, db.ForeignKey(
         'users.id'),  nullable=False)
     tgl_pinjam = db.Column(
-        db.DateTime, default=datetime.datetime.now().replace(microsecond=0), onupdate=datetime.datetime.now().replace(microsecond=0))
+        db.DateTime(timezone=True), server_default=db.func.now())
     qty = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Boolean, default=False)
 
@@ -113,7 +113,7 @@ class Pengembalians(db.Model):
     id_peminjaman = db.Column(
         db.Integer, db.ForeignKey('peminjamans.id_peminjaman'), nullable=False)
     tgl_pengembalian = db.Column(
-        db.DateTime, default=datetime.datetime.now().replace(microsecond=0), onupdate=datetime.datetime.now().replace(microsecond=0))
+        db.DateTime(timezone=True), server_default=db.func.now())
 
     barang = db.relationship(Barangs, backref=backref(
         "pengembalians", cascade="all, delete-orphan"))
@@ -124,20 +124,20 @@ class Pengembalians(db.Model):
 
 
 # 404 page not found
-@app.errorhandler(404)
+@ app.errorhandler(404)
 def error_404(e):
     return render_template('error-404.html'), 404
 
 
 # 505 internal server error
-@app.errorhandler(500)
+@ app.errorhandler(500)
 def error_500(e):
     return render_template('error-500.html'), 500
 
 
 # login page
-@app.route('/', methods=["GET", "POST"])
-@app.route('/login', methods=["GET", "POST"])
+@ app.route('/', methods=["GET", "POST"])
+@ app.route('/login', methods=["GET", "POST"])
 def login():
     if request.method == 'POST':
         email = request.form.get('email')
@@ -162,7 +162,7 @@ def login():
 
 
 # register page
-@app.route('/register', methods=["GET", "POST"])
+@ app.route('/register', methods=["GET", "POST"])
 def register():
     if request.method == 'POST':
         name = request.form.get('name')
@@ -191,8 +191,8 @@ def register():
 
 
 # dashboard page
-@app.route('/dashboard', methods=["GET", "POST"])
-@login_required
+@ app.route('/dashboard', methods=["GET", "POST"])
+@ login_required
 def user_dashboard():
     peminjamans = Peminjamans().query.all()
     barangs = Barangs().query.all()
@@ -217,180 +217,294 @@ def user_dashboard():
 @app.route('/user-management', methods=["GET", "POST"])
 @login_required
 def show_user():
-    items = Users().query.all()
-    return render_template('user-management.html', items=items, name=current_user.name, admin=current_user.is_admin)
+    # if Admin
+    if current_user.is_admin == True:
+
+        items = Users().query.all()
+
+        return render_template('user-management.html', items=items, name=current_user.name, admin=current_user.is_admin)
+
+    # if User
+    if current_user.is_admin == False:
+        return error_404(e)
 
 
 # user edit page
 @app.route('/edit-user/<int:id>', methods=["GET", "POST"])
 @login_required
 def edit_user(id):
-    update = Users.query.get_or_404(id)
+    # if Admin
+    if current_user.is_admin == True:
 
-    if request.method == 'POST':
-        update.name = request.form.get('name')
-        update.email = request.form.get('email')
-        password = request.form.get('password')
-        update.password = generate_password_hash(password, method='sha256')
-        update.is_admin = request.form.get('is_admin')
+        update = Users.query.get_or_404(id)
 
-        # if True, then user is Administrator
-        if update.is_admin == 'True':
-            update.is_admin = True
-        # if False, then user is Penduduk Desa
-        elif update.is_admin == 'False':
-            update.is_admin = False
+        if request.method == 'POST':
+            update.name = request.form.get('name')
+            update.email = request.form.get('email')
+            password = request.form.get('password')
+            update.password = generate_password_hash(password, method='sha256')
+            update.is_admin = request.form.get('is_admin')
 
-        db.session.add(update)
-        db.session.commit()
-        return redirect(url_for('show_user'))
+            # if True, then user is Administrator
+            if update.is_admin == 'True':
+                update.is_admin = True
+            # if False, then user is Penduduk Desa
+            elif update.is_admin == 'False':
+                update.is_admin = False
 
-    return render_template('edit-user.html', name=current_user.name, admin=current_user.is_admin, update=update)
+            db.session.add(update)
+            db.session.commit()
+            return redirect(url_for('show_user'))
+
+        return render_template('edit-user.html', name=current_user.name, admin=current_user.is_admin, update=update)
+
+    # if User
+    if current_user.is_admin == False:
+        return error_404(e)
 
 
 # delete user
 @ app.route('/delete-user/<int:id>', methods=["GET", "POST"])
 @ login_required
 def delete_user(id):
-    item = Users.query.get_or_404(id)
+    # if Admin
+    if current_user.is_admin == True:
 
-    db.session.delete(item)
-    db.session.commit()
+        user = Users.query.get_or_404(id)
 
-    return redirect(url_for('show_user'))
+        db.session.delete(user)
+        db.session.commit()
+
+        return redirect(url_for('show_user'))
+
+    # if User
+    if current_user.is_admin == False:
+        return error_404(e)
 
 
 # show barangs page
 @ app.route('/barang-management', methods=["GET", "POST"])
 @ login_required
 def show_barang():
-    barangs = Barangs().query.all()
-    return render_template('barang-management.html', barangs=barangs, name=current_user.name, admin=current_user.is_admin)
+    # if Admin
+    if current_user.is_admin == True:
+
+        barangs = Barangs().query.all()
+
+        return render_template('barang-management.html', barangs=barangs, name=current_user.name, admin=current_user.is_admin)
+
+    # if User
+    if current_user.is_admin == False:
+        return error_404(e)
 
 
 # add barang page
 @ app.route('/add-barang', methods=["GET", "POST"])
 @ login_required
 def add_barang():
-    if request.method == 'POST':
-        nama_barang = request.form.get('nama_barang')
-        jenis_barang = request.form.get('jenis_barang')
-        stok_barang = request.form.get('stok_barang')
-        foto_barang = photos.save(request.files.get(
-            'foto_barang'), name=secrets.token_hex(10) + '.')
+    # if Admin
+    if current_user.is_admin == True:
 
-        # if this returns a barang,
-        # then the nama barang already exists in database
-        barang = Barangs.query.filter_by(nama_barang=nama_barang).first()
+        if request.method == 'POST':
+            nama_barang = request.form.get('nama_barang')
+            jenis_barang = request.form.get('jenis_barang')
+            stok_barang = request.form.get('stok_barang')
+            foto_barang = photos.save(request.files.get(
+                'foto_barang'), name=secrets.token_hex(10) + '.')
 
-        if barang:  # if a barang is found
-            #flash('Barang sudah tersedia !', 'danger')
-            return redirect(url_for('add_barang'))
+            # if this returns a barang,
+            # then the nama barang already exists in database
+            barang = Barangs.query.filter_by(nama_barang=nama_barang).first()
 
-        if not foto_barang:
-            #flash('Foto tidak di isi !', 'danger')
-            return redirect(url_for('add_barang'))
+            if barang:  # if a barang is found
+                # flash('Barang sudah tersedia !', 'danger')
+                return redirect(url_for('add_barang'))
 
-        # create new barang
-        new_barang = Barangs(nama_barang=nama_barang, jenis_barang=jenis_barang,
-                             stok_barang=stok_barang, foto_barang=foto_barang)
+            if not foto_barang:
+                # flash('Foto tidak di isi !', 'danger')
+                return redirect(url_for('add_barang'))
 
-        # add the new barang to the database
-        db.session.add(new_barang)
-        db.session.commit()
-        #flash('Barang berhasil ditambahkan !', 'success')
-        return redirect(url_for('show_barang'))
+            # create new barang
+            new_barang = Barangs(nama_barang=nama_barang, jenis_barang=jenis_barang,
+                                 stok_barang=stok_barang, foto_barang=foto_barang)
 
-    return render_template('add-barang.html', name=current_user.name, admin=current_user.is_admin)
+            # add the new barang to the database
+            db.session.add(new_barang)
+            db.session.commit()
+            # flash('Barang berhasil ditambahkan !', 'success')
+            return redirect(url_for('show_barang'))
+
+        return render_template('add-barang.html', name=current_user.name, admin=current_user.is_admin)
+
+    # if User
+    if current_user.is_admin == False:
+        return error_404(e)
 
 
 # barang edit page
 @ app.route('/edit-barang/<int:id_barang>', methods=["GET", "POST"])
 @ login_required
 def edit_barang(id_barang):
-    update = Barangs.query.get_or_404(id_barang)
+    # if Admin
+    if current_user.is_admin == True:
 
-    if request.method == 'POST':
-        update.nama_barang = request.form.get('nama_barang')
-        update.jenis_barang = request.form.get('jenis_barang')
-        update.stok_barang = request.form.get('stok_barang')
-        if request.files.get('foto_barang'):
-            try:
-                os.unlink(os.path.join(current_app.root_path,
-                          'static/backend/assets/images/barang/' + update.foto_barang))
-                update.foto_barang = photos.save(request.files.get(
-                    'foto_barang'), name=secrets.token_hex(10) + '.')
-            except:
-                update.foto_barang = photos.save(request.files.get(
-                    'foto_barang'), name=secrets.token_hex(10) + '.')
+        update = Barangs.query.get_or_404(id_barang)
 
-        if not update.foto_barang:
-            #flash('Foto tidak di isi !', 'danger')
-            return redirect(url_for('edit_barang'))
+        if request.method == 'POST':
+            update.nama_barang = request.form.get('nama_barang')
+            update.jenis_barang = request.form.get('jenis_barang')
+            update.stok_barang = request.form.get('stok_barang')
+            if request.files.get('foto_barang'):
+                try:
+                    os.unlink(os.path.join(current_app.root_path,
+                                           'static/backend/assets/images/barang/' + update.foto_barang))
+                    update.foto_barang = photos.save(request.files.get(
+                        'foto_barang'), name=secrets.token_hex(10) + '.')
+                except:
+                    update.foto_barang = photos.save(request.files.get(
+                        'foto_barang'), name=secrets.token_hex(10) + '.')
 
-        db.session.commit()
-        return redirect(url_for('show_barang'))
+            if not update.foto_barang:
+                # flash('Foto tidak di isi !', 'danger')
+                return redirect(url_for('edit_barang'))
 
-    return render_template('edit-barang.html', name=current_user.name, admin=current_user.is_admin, update=update)
+            db.session.commit()
+            return redirect(url_for('show_barang'))
+
+        return render_template('edit-barang.html', name=current_user.name, admin=current_user.is_admin, update=update)
+
+    # if User
+    if current_user.is_admin == False:
+        return error_404(e)
 
 
 # delete barang
 @ app.route('/delete-barang/<int:id_barang>', methods=["GET", "POST"])
 @ login_required
 def delete_barang(id_barang):
-    delete = Barangs.query.get_or_404(id_barang)
+    # if Admin
+    if current_user.is_admin == True:
 
-    try:
-        os.unlink(os.path.join(current_app.root_path,
-                               'static/backend/assets/images/barang/' + delete.foto_barang))
-        db.session.delete(delete)
-    except:
-        db.session.delete(delete)
+        delete = Barangs.query.get_or_404(id_barang)
 
-    db.session.commit()
+        try:
+            os.unlink(os.path.join(current_app.root_path,
+                                   'static/backend/assets/images/barang/' + delete.foto_barang))
+            db.session.delete(delete)
+        except:
+            db.session.delete(delete)
 
-    return redirect(url_for('show_barang'))
+        db.session.commit()
+
+        return redirect(url_for('show_barang'))
+
+    # if User
+    if current_user.is_admin == False:
+        return error_404(e)
 
 
 # show peminjaman page
 @ app.route('/peminjaman-management', methods=["GET", "POST"])
 @ login_required
 def show_peminjaman():
-    peminjamans = Peminjamans().query.all()
-    barangs = Barangs().query.all()
-    users = Users().query.all()
+    # if Admin
+    if current_user.is_admin == True:
 
-    return render_template('peminjaman-management.html', peminjamans=peminjamans, name=current_user.name, admin=current_user.is_admin, barangs=barangs, users=users)
+        peminjamans = Peminjamans().query.all()
+        barangs = Barangs().query.all()
+        users = Users().query.all()
+
+        return render_template('peminjaman-management.html', peminjamans=peminjamans, name=current_user.name, admin=current_user.is_admin, barangs=barangs, users=users)
+
+    # if User
+    if current_user.is_admin == False:
+        return error_404(e)
+
+
+# status edit page
+@app.route('/edit-status/<int:id_peminjaman>', methods=["GET", "POST"])
+@login_required
+def edit_status(id_peminjaman):
+    # if Admin
+    if current_user.is_admin == True:
+
+        update = Peminjamans.query.get_or_404(id_peminjaman)
+
+        if request.method == 'POST':
+
+            update.id_barang = request.form.get('id_barang')
+            update.id_user = request.form.get('id_user')
+            update.id_peminjaman = request.form.get('id_peminjaman')
+
+            update.status = request.form.get('status')
+
+            # if True, then status is Sudah Dikembalikan
+            if update.status == 'True':
+                update.status = True
+
+                new_pengembalian = Pengembalians(
+                    id_barang=update.id_barang, id_user=update.id_user, id_peminjaman=update.id_peminjaman)
+
+                db.session.add(update)
+                db.session.add(new_pengembalian)
+                db.session.commit()
+
+            # if False, then status is Belum Dikembalikan
+            elif update.status == 'False':
+                update.status = False
+
+                db.session.query(Pengembalians).filter(
+                    Pengembalians.id_pengembalian == id_peminjaman).delete()
+
+                db.session.commit()
+
+            db.session.add(update)
+            db.session.commit()
+            return redirect(url_for('show_pengembalian'))
+
+        return render_template('edit-status.html', name=current_user.name, admin=current_user.is_admin, update=update)
+
+    # if User
+    if current_user.is_admin == False:
+        return error_404(e)
+
+
+# delete peminajamn
+@ app.route('/delete-peminjaman/<int:id_peminjaman>', methods=["GET", "POST"])
+@ login_required
+def delete_peminjaman(id_peminjaman):
+    # if Admin
+    if current_user.is_admin == True:
+
+        item = Peminjamans.query.get_or_404(id_peminjaman)
+
+        db.session.delete(item)
+        db.session.commit()
+
+        return redirect(url_for('show_peminjaman'))
+
+    # if User
+    if current_user.is_admin == False:
+        return error_404(e)
 
 
 # show pengembalian page
 @ app.route('/pengembalian-management', methods=["GET", "POST"])
 @ login_required
 def show_pengembalian():
-    peminjamans = Peminjamans().query.all()
-    barangs = Barangs().query.all()
-    users = Users().query.all()
+    # if Admin
+    if current_user.is_admin == True:
 
-    if request.method == 'POST':
-        id_barang = request.form.get('id_barang')
-        id_user = request.form.get('id_user')
-        qty = request.form.get('qty')
+        pengembalians = Pengembalians().query.all()
+        peminjamans = Peminjamans().query.all()
+        barangs = Barangs().query.all()
+        users = Users().query.all()
 
-        new_peminjaman = Peminjamans(
-            id_barang=id_barang, id_user=id_user, qty=qty)
+        return render_template('pengembalian-management.html', id_user=current_user.id, name=current_user.name, admin=current_user.is_admin, pengembalians=pengembalians, peminjamans=peminjamans, barangs=barangs, users=users)
 
-        db.session.add(new_peminjaman)
-        db.session.commit()
-        return redirect(url_for('user_dashboard'))
-
-    return render_template('pengembalian-management.html', id_user=current_user.id, name=current_user.name, admin=current_user.is_admin, peminjamans=peminjamans, barangs=barangs, users=users)
-
-
-# user page
-@ app.route('/user', methods=["GET", "POST"])
-@ login_required
-def user():
-    return render_template('user.html', name=current_user.name)
+    # if User
+    if current_user.is_admin == False:
+        return error_404(e)
 
 
 # logout
@@ -399,12 +513,6 @@ def user():
 def logout():
     logout_user()
     return redirect(url_for('login'))
-
-
-# # pengembalian page
-# @ app.route('/pengembalian', methods=["GET", "POST"])
-# def add_pengembalian():
-#     items = Barangs.query.filter_by(id_barang=id).first()
 
 
 # main app
