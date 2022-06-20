@@ -283,8 +283,8 @@ def delete_user(id):
 
         user = Users.query.get_or_404(id)
 
-        db.session.query(Pengembalians).filter(
-            Pengembalians.id_user == id).delete()
+        db.session.query(Peminjamans).filter(
+            Peminjamans.id_user == id).delete()
 
         db.session.delete(user)
         db.session.commit()
