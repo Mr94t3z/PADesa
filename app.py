@@ -19,7 +19,10 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
 
 # sqlalchemy database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///padesa.db'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///padesa.db'
+
+# heroku postgreql
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://gcvqtsjyydsejv:a7958ba2e2c62a300100ffd72c7267760d654d5d7350a30fef5afea1dc7efbe2@ec2-3-224-8-189.compute-1.amazonaws.com:5432/dmle6r03165jl'
 
 # Secret Key
 app.config['SECRET_KEY'] = 'mr.94t3z'
@@ -436,7 +439,6 @@ def edit_status(id_peminjaman):
     if current_user.is_admin == True:
 
         update = Peminjamans.query.get_or_404(id_peminjaman)
-        barangs = Barangs().query.all()
 
         if request.method == 'POST':
 
@@ -470,7 +472,7 @@ def edit_status(id_peminjaman):
             db.session.commit()
             return redirect(url_for('show_pengembalian'))
 
-        return render_template('edit-status.html', name=current_user.name, admin=current_user.is_admin, update=update, barangs=barangs)
+        return render_template('edit-status.html', name=current_user.name, admin=current_user.is_admin, update=update)
 
     # if User
     if current_user.is_admin == False:
