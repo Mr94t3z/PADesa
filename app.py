@@ -1,5 +1,5 @@
-import datetime
 import os
+import datetime
 import secrets
 from cmath import e
 from flask import Flask, flash, request, redirect, render_template, url_for, current_app
@@ -8,6 +8,7 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, log
 from flask_uploads import IMAGES, UploadSet, configure_uploads
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
+from datetime import datetime
 from sqlalchemy.orm import relationship, backref
 
 # Add Database
@@ -93,7 +94,7 @@ class Peminjamans(db.Model):
     id_user = db.Column(db.Integer, db.ForeignKey(
         'users.id'),  nullable=False)
     tgl_pinjam = db.Column(
-        db.DateTime(timezone=True), default=datetime.datetime.utcnow)
+        db.DateTime(), default=datetime.now())
     qty = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Boolean, default=False)
 
@@ -117,7 +118,7 @@ class Pengembalians(db.Model):
     id_peminjaman = db.Column(
         db.Integer, db.ForeignKey('peminjamans.id_peminjaman'), nullable=False)
     tgl_pengembalian = db.Column(
-        db.DateTime(timezone=True), default=datetime.datetime.utcnow)
+        db.DateTime(), default=datetime.now())
 
     barang = db.relationship(Barangs, backref=backref(
         "pengembalians", cascade="all, delete-orphan"))
