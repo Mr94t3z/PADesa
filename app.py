@@ -244,33 +244,33 @@ def show_user():
 @login_required
 def edit_user(id):
     # if Admin
-    # if current_user.is_admin == True:
+    if current_user.is_admin == True:
 
-    update = Users.query.get_or_404(id)
+        update = Users.query.get_or_404(id)
 
-    if request.method == 'POST':
-        update.name = request.form.get('name')
-        update.email = request.form.get('email')
-        password = request.form.get('password')
-        update.password = generate_password_hash(password, method='sha256')
-        update.is_admin = request.form.get('is_admin')
+        if request.method == 'POST':
+            update.name = request.form.get('name')
+            update.email = request.form.get('email')
+            password = request.form.get('password')
+            update.password = generate_password_hash(password, method='sha256')
+            update.is_admin = request.form.get('is_admin')
 
-        # if True, then user is Administrator
-        if update.is_admin == 'True':
-            update.is_admin = True
-        # if False, then user is Penduduk Desa
-        elif update.is_admin == 'False':
-            update.is_admin = False
+            # if True, then user is Administrator
+            if update.is_admin == 'True':
+                update.is_admin = True
+            # if False, then user is Penduduk Desa
+            elif update.is_admin == 'False':
+                update.is_admin = False
 
-        db.session.add(update)
-        db.session.commit()
-        return redirect(url_for('show_user'))
+            db.session.add(update)
+            db.session.commit()
+            return redirect(url_for('show_user'))
 
-    return render_template('edit-user.html', name=current_user.name, admin=current_user.is_admin, update=update)
+        return render_template('edit-user.html', name=current_user.name, admin=current_user.is_admin, update=update)
 
     # if User
-    # if current_user.is_admin == False:
-    #     return error_404(e)
+    if current_user.is_admin == False:
+        return error_404(e)
 
 
 # delete user
