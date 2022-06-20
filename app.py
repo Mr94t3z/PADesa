@@ -19,10 +19,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
 
 # sqlalchemy database
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///padesa.db'
-
-# heroku postgreql
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://gcvqtsjyydsejv:a7958ba2e2c62a300100ffd72c7267760d654d5d7350a30fef5afea1dc7efbe2@ec2-3-224-8-189.compute-1.amazonaws.com:5432/dmle6r03165jl'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///padesa.db'
 
 # Secret Key
 app.config['SECRET_KEY'] = 'mr.94t3z'
@@ -528,6 +525,6 @@ def logout():
     return redirect(url_for('login'))
 
 
-# # main app
-# if __name__ == '__main__':
-#     app.run(debug=True)  # (debug=False, host='0.0.0.0')
+# main app
+if __name__ == '__main__':
+    app.run(debug=True)  # (debug=False, host='0.0.0.0')
