@@ -1,5 +1,5 @@
-import os
 import datetime
+import os
 import secrets
 from cmath import e
 from flask import Flask, flash, request, redirect, render_template, url_for, current_app
@@ -94,9 +94,9 @@ class Peminjamans(db.Model):
     id_user = db.Column(db.Integer, db.ForeignKey(
         'users.id'),  nullable=False)
     tgl_pinjam = db.Column(
-        db.DateTime(timezone=True), default=datetime.now())
+        db.DateTime(timezone=True), default=datetime.datetime.utcnow)
     qty = db.Column(db.Integer, nullable=False)
-    status = db.Column(db.Boolean, server_default=False)
+    status = db.Column(db.Boolean, default=False)
 
     barang = db.relationship(Barangs, backref=backref(
         "peminjamans", cascade="all, delete-orphan"))
@@ -118,7 +118,7 @@ class Pengembalians(db.Model):
     id_peminjaman = db.Column(
         db.Integer, db.ForeignKey('peminjamans.id_peminjaman'), nullable=False)
     tgl_pengembalian = db.Column(
-        db.DateTime(timezone=True), server_default=datetime.now())
+        db.DateTime(timezone=True), default=datetime.datetime.utcnow)
 
     barang = db.relationship(Barangs, backref=backref(
         "pengembalians", cascade="all, delete-orphan"))
