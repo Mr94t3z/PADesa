@@ -7,6 +7,7 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, log
 from flask_uploads import IMAGES, UploadSet, configure_uploads
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
+from datetime import datetime
 from sqlalchemy.orm import relationship, backref
 
 # Add Database
@@ -19,10 +20,10 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
 
 # sqlalchemy database
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///padesa.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///padesa.db'
 
-# heroku postgreql
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://gcvqtsjyydsejv:a7958ba2e2c62a300100ffd72c7267760d654d5d7350a30fef5afea1dc7efbe2@ec2-3-224-8-189.compute-1.amazonaws.com:5432/dmle6r03165jl'
+# # heroku postgreql
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://gcvqtsjyydsejv:a7958ba2e2c62a300100ffd72c7267760d654d5d7350a30fef5afea1dc7efbe2@ec2-3-224-8-189.compute-1.amazonaws.com:5432/dmle6r03165jl'
 
 # Secret Key
 app.config['SECRET_KEY'] = 'mr.94t3z'
@@ -92,7 +93,7 @@ class Peminjamans(db.Model):
     id_user = db.Column(db.Integer, db.ForeignKey(
         'users.id'),  nullable=False)
     tgl_pinjam = db.Column(
-        db.DateTime(timezone=True), server_default=db.func.now())
+        db.DateTime(timezone=True), default=datetime.datetime.utcnow)
     qty = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Boolean, default=False)
 
@@ -116,7 +117,7 @@ class Pengembalians(db.Model):
     id_peminjaman = db.Column(
         db.Integer, db.ForeignKey('peminjamans.id_peminjaman'), nullable=False)
     tgl_pengembalian = db.Column(
-        db.DateTime(timezone=True), server_default=db.func.now())
+        db.DateTime(timezone=True), default=datetime.datetime.utcnow)
 
     barang = db.relationship(Barangs, backref=backref(
         "pengembalians", cascade="all, delete-orphan"))
@@ -282,6 +283,9 @@ def delete_user(id):
 
         user = Users.query.get_or_404(id)
 
+        db.session.query(Pengembalians).filter(
+            Pengembalians.id_user == id).delete()
+
         db.session.delete(user)
         db.session.commit()
 
@@ -439,6 +443,7 @@ def edit_status(id_peminjaman):
     if current_user.is_admin == True:
 
         update = Peminjamans.query.get_or_404(id_peminjaman)
+        barangs = Barangs().query.all()
 
         if request.method == 'POST':
 
@@ -472,7 +477,7 @@ def edit_status(id_peminjaman):
             db.session.commit()
             return redirect(url_for('show_pengembalian'))
 
-        return render_template('edit-status.html', name=current_user.name, admin=current_user.is_admin, update=update)
+        return render_template('edit-status.html', name=current_user.name, admin=current_user.is_admin, update=update, barangs=barangs)
 
     # if User
     if current_user.is_admin == False:
@@ -527,6 +532,6 @@ def logout():
     return redirect(url_for('login'))
 
 
-# main app
+# # main app
 if __name__ == '__main__':
     app.run(debug=True)  # (debug=False, host='0.0.0.0')
