@@ -42,7 +42,9 @@
                         {% endif %}
                         {% endfor %}
                         {% for peminjaman in peminjamans %}
+                        {% if pengembalian.id_peminjaman == peminjaman.id_peminjaman%}
                         <td> {{ peminjaman.tgl_pinjam }} </td>
+                        {% endif %}
                         {% endfor %}
                         <td> {{ pengembalian.tgl_pengembalian }} </td>
                     {% endfor %}

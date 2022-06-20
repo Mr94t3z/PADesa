@@ -202,7 +202,13 @@ def user_dashboard():
     if request.method == 'POST':
         id_barang = request.form.get('id_barang')
         id_user = request.form.get('id_user')
-        qty = request.form.get('qty')
+        qty = request.form.get('qty', type=int)
+        stok_barang = request.form.get('stok_barang', type=int)
+
+        stok_barang = stok_barang - qty
+
+        Barangs.query.filter_by(id_barang=id_barang).update(
+            dict(stok_barang=stok_barang))
 
         new_peminjaman = Peminjamans(
             id_barang=id_barang, id_user=id_user, qty=qty)
@@ -430,6 +436,7 @@ def edit_status(id_peminjaman):
     if current_user.is_admin == True:
 
         update = Peminjamans.query.get_or_404(id_peminjaman)
+        barangs = Barangs().query.all()
 
         if request.method == 'POST':
 
@@ -463,7 +470,7 @@ def edit_status(id_peminjaman):
             db.session.commit()
             return redirect(url_for('show_pengembalian'))
 
-        return render_template('edit-status.html', name=current_user.name, admin=current_user.is_admin, update=update)
+        return render_template('edit-status.html', name=current_user.name, admin=current_user.is_admin, update=update, barangs=barangs)
 
     # if User
     if current_user.is_admin == False:
@@ -476,6 +483,8 @@ def edit_status(id_peminjaman):
 def delete_peminjaman(id_peminjaman):
     # if Admin
     if current_user.is_admin == True:
+        db.session.query(Pengembalians).filter(
+            Pengembalians.id_pengembalian == id_peminjaman).delete()
 
         item = Peminjamans.query.get_or_404(id_peminjaman)
 

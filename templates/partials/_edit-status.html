@@ -22,6 +22,9 @@
                 <input type="hidden" name="id_user" value={{ update.id_user }}>
                 <input type="hidden" name="id_peminjaman" value={{ update.id_barang }}>
 
+                <input type="hidden" name="qty" value={{ peminjamans.qty }}>
+                <input type="hidden" name="stok_barang" value={{ barangs.stok_barang }}>
+
                 <div class="form-group">
                     <label for="SelectRole">Status</label>
                     <select class="form-control" value="{{ update.status }}" name="status" id="status">

@@ -67,7 +67,7 @@
                                <i class="mdi mdi-table-edit"></i>
                            </a>
                            <!-- delete -->
-                           <a href="{{ url_for('delete_peminjaman', id_peminjaman=peminjaman.id_peminjaman ) }}" type="submit" class="btn btn-danger btn-rounded btn-sm" onclick="return confirm('Apakah anda ingin menghapus peminjaman ke - {{ peminjaman.id_peminjaman }}?')" title="Delete Peminjaman">
+                           <a href="{{ url_for('delete_peminjaman', id_peminjaman=peminjaman.id_peminjaman ) }}" type="submit" class="btn btn-danger btn-rounded btn-sm" onclick="return confirm('Apakah anda ingin menghapus peminjaman ke - {{ loop.index }}?')" title="Delete Peminjaman">
                                <i class="mdi mdi-window-close"></i>
                            </a>
                        </td>
