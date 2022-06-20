@@ -1,6 +1,5 @@
 import os
 import secrets
-import datetime
 from cmath import e
 from flask import Flask, flash, request, redirect, render_template, url_for, current_app
 from flask_sqlalchemy import SQLAlchemy
@@ -94,7 +93,7 @@ class Peminjamans(db.Model):
     id_user = db.Column(db.Integer, db.ForeignKey(
         'users.id'),  nullable=False)
     tgl_pinjam = db.Column(
-        db.DateTime(), default=date.now())
+        db.DateTime(), default=date.today())
     qty = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Boolean, default=False)
 
@@ -118,7 +117,7 @@ class Pengembalians(db.Model):
     id_peminjaman = db.Column(
         db.Integer, db.ForeignKey('peminjamans.id_peminjaman'), nullable=False)
     tgl_pengembalian = db.Column(
-        db.DateTime(), default=date.now())
+        db.DateTime(), default=date.today())
 
     barang = db.relationship(Barangs, backref=backref(
         "pengembalians", cascade="all, delete-orphan"))
