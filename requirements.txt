@@ -1,0 +1,5 @@
+Flask
+flask_uploads
+flask_sqlalchemy
+flask_login
+flask_migrate
