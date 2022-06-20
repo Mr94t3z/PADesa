@@ -6,3 +6,4 @@ env/
 
 # database
 migrations/
+padesa.db
