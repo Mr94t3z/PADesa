@@ -20,7 +20,10 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
 
 # sqlalchemy database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///padesa.db'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///padesa.db'
+
+# heroku postgreql
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://igdfkwoytovugl:ae2d376b89b25e8f9d31fd9876e52d4d549f159b2d0cdba210600a395e0ef8ea@ec2-3-224-164-189.compute-1.amazonaws.com:5432/d4ffi7dui3j5bu'
 
 # Secret Key
 app.config['SECRET_KEY'] = 'mr.94t3z'
