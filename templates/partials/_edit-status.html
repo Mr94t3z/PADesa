@@ -22,14 +22,21 @@
                 <input type="hidden" name="id_user" value={{ update.id_user }}>
                 <input type="hidden" name="id_peminjaman" value={{ update.id_peminjaman }}>
 
+                {% if update.status == False %}
                 <div class="form-group">
                     <label for="SelectRole">Status</label>
                     <select class="form-control" value="{{ update.status }}" name="status" id="status">
                         <option value="True">Sudah Dikembalikan</option>
+                    </select>
+                </div>
+                {% elif update.status == True %}
+                <div class="form-group">
+                    <label for="SelectRole">Status</label>
+                    <select class="form-control" value="{{ update.status }}" name="status" id="status">
                         <option value="False">Belum Dikembalikan</option>
                     </select>
                 </div>
-
+                {% endif %}
                 <button type="submit" class="btn btn-gradient-info me-2">
                     Submit
                 </button>

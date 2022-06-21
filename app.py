@@ -466,8 +466,9 @@ def edit_status(id_peminjaman):
                 update.status = False
 
                 db.session.query(Pengembalians).filter(
-                    Pengembalians.id_pengembalian == id_peminjaman).delete()
+                    Pengembalians.id_peminjaman == id_peminjaman).delete()
 
+                db.session.add(update)
                 db.session.commit()
 
             db.session.add(update)
@@ -488,7 +489,7 @@ def delete_peminjaman(id_peminjaman):
     # if Admin
     if current_user.is_admin == True:
         db.session.query(Pengembalians).filter(
-            Pengembalians.id_pengembalian == id_peminjaman).delete()
+            Pengembalians.id_peminjaman == id_peminjaman).delete()
 
         item = Peminjamans.query.get_or_404(id_peminjaman)
 
